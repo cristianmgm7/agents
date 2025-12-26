@@ -15,7 +15,7 @@ if not CARBON_VOICE_API_KEY:
 
 # Create Carbon Voice agent with MCP tools
 carbon_voice_agent = Agent(
-    model='gemini-1.5-flash',
+    model='gemini-2.5-flash',
     name='carbon_voice_agent',
     description='A communication specialist for Carbon Voice messaging platform operations.',
     instruction='''You are a Carbon Voice communication specialist with expertise in messaging, user management, and workspace organization.

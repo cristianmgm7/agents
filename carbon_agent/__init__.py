@@ -21,9 +21,10 @@ except ValueError as e:
     else:
         raise
 
-# Optionally import OAuth-based agent (uncomment to use HTTP transport instead)
-# try:
-#     from . import carbon_voice_oauth_agent
-#     carbon_voice_oauth_agent_available = True
-# except (ValueError, ImportError):
-#     carbon_voice_oauth_agent_available = False
+# Import OAuth-based agent for HTTP transport
+try:
+    from . import carbon_voice_oauth_agent
+    carbon_voice_oauth_available = True
+except (ValueError, ImportError) as e:
+    carbon_voice_oauth_available = False
+    print(f"OAuth agent not available: {e}")

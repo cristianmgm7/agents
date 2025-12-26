@@ -26,6 +26,9 @@ TOKEN_ENDPOINT = 'https://api.carbonvoice.app/oauth/token'  # Update with actual
 class OAuthCallbackHandler(http.server.BaseHTTPRequestHandler):
     """Handles OAuth2 callback"""
 
+    # Class variable to signal when we're done
+    auth_complete = False
+
     def do_GET(self):
         """Handle the OAuth2 callback"""
         self.send_response(200)
@@ -46,8 +49,9 @@ class OAuthCallbackHandler(http.server.BaseHTTPRequestHandler):
             if access_token:
                 # Save to .env file
                 self.save_token_to_env(access_token)
+                OAuthCallbackHandler.auth_complete = True
 
-                self.wfile.write(b'<html><body><h1>Success!</h1><p>Your Carbon Voice API key has been saved to .env file.</p><p>You can close this window.</p></body></html>')
+                self.wfile.write(b'<html><body><h1>Success!</h1><p>Your Carbon Voice API key has been saved to .env file.</p><p>You can close this window and return to the terminal.</p></body></html>')
             else:
                 self.wfile.write(b'<html><body><h1>Error</h1><p>Failed to exchange authorization code for access token.</p></body></html>')
         else:
@@ -125,7 +129,13 @@ def start_oauth_flow():
     with socketserver.TCPServer(("", port), OAuthCallbackHandler) as httpd:
         print(f"🚀 Local server listening on port {port}")
         print("🔄 Complete authorization in your browser...")
-        httpd.serve_request()  # Handle one request then exit
+        print("⏳ Waiting for callback...")
+
+        # Handle requests until we get the authorization code
+        while not OAuthCallbackHandler.auth_complete:
+            httpd.handle_request()
+
+        print("✅ Authorization completed!")
 
 if __name__ == "__main__":
     print("🚀 Carbon Voice OAuth2 Helper")

@@ -11,13 +11,28 @@ except ValueError as e:
     else:
         raise
 
+# Try to import Carbon Voice agents (regular first, OAuth as fallback)
+carbon_voice_agent = None
+carbon_voice_available = False
+
+# Try regular stdio agent first
 try:
-    from .carbon_voice_agent import carbon_voice_agent
+    from .carbon_voice_agent import carbon_voice_agent as stdio_agent
+    carbon_voice_agent = stdio_agent
     carbon_voice_available = True
+    print("✅ Carbon Voice stdio agent loaded")
 except ValueError as e:
     if "CARBON_VOICE_API_KEY" in str(e):
-        carbon_voice_available = False
-        carbon_voice_agent = None
+        print("⚠️  Stdio agent needs CARBON_VOICE_API_KEY, trying OAuth agent...")
+        # Try OAuth agent as fallback
+        try:
+            from .carbon_voice_oauth_agent import carbon_voice_oauth_agent as oauth_agent
+            carbon_voice_agent = oauth_agent
+            carbon_voice_available = True
+            print("✅ Carbon Voice OAuth agent loaded")
+        except (ValueError, ImportError) as oauth_e:
+            print(f"❌ Both Carbon Voice agents unavailable")
+            carbon_voice_available = False
     else:
         raise
 
@@ -35,7 +50,7 @@ if carbon_voice_available:
     sub_agents.append(carbon_voice_agent)
 
 root_agent = Agent(
-    model='gemini-1.5-flash',
+    model='gemini-2.5-flash',
     name='root_agent',
     description='An intelligent orchestrator that coordinates specialized sub-agents for comprehensive task completion.',
     instruction='''You are an intelligent orchestrator agent that coordinates multiple specialized sub-agents to help users accomplish complex tasks.
@@ -43,7 +58,7 @@ root_agent = Agent(
     You have access to specialized sub-agents that can help with different types of tasks:
     - market_analyzer: Professional market analysis, financial research, and investment insights
     ''' + ('- github_agent: GitHub repository management, issues, pull requests, and code analysis\n    ' if github_available else '- github_agent: Not available (configure GITHUB_TOKEN to enable GitHub operations)\n    ') + '''
-    ''' + ('- carbon_voice_agent: Carbon Voice messaging platform operations, communication, and organization\n    ' if carbon_voice_available else '- carbon_voice_agent: Not available (configure CARBON_VOICE_API_KEY to enable messaging operations)\n    ') + '''
+    ''' + ('- carbon_voice_agent: Carbon Voice messaging platform operations, communication, and organization\n    ' if carbon_voice_available else '- carbon_voice_agent: Not available (configure CARBON_VOICE_API_KEY for stdio or complete OAuth2 setup for HTTP transport)\n    ') + '''
     When you need to delegate a task to a sub-agent, use the transfer_to_agent function with the appropriate agent name.
 
     Your role is to:
