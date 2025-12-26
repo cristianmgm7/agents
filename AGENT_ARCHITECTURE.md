@@ -12,7 +12,7 @@ This project implements a hierarchical multi-agent system using Google Agent Dev
   - Uses `transfer_to_agent()` calls to delegate to specialized sub-agents
   - Maintains conversation flow across agent transfers
   - Provides unified interface to multiple specialized agents
-- **Sub-Agents:** market_analyzer (always available), github_agent (conditional on GITHUB_TOKEN)
+- **Sub-Agents:** market_analyzer (always available), github_agent (conditional on GITHUB_TOKEN), carbon_voice_agent (conditional on CARBON_VOICE_API_KEY)
 
 ### 2. GitHub Agent (Sub-Agent)
 **File:** `carbon_agent/github_agent.py`
@@ -36,6 +36,19 @@ This project implements a hierarchical multi-agent system using Google Agent Dev
   - Risk assessment and portfolio strategy analysis
 - **Tools:** GoogleSearchTool for comprehensive market data and financial information
 
+### 4. Carbon Voice Agent (Sub-Agent)
+**File:** `carbon_agent/carbon_voice_agent.py`
+- **Role:** Communication and messaging platform sub-agent
+- **Capabilities:**
+  - Message management (conversation, direct, voice memos)
+  - User directory operations and search
+  - Conversation thread management and organization
+  - Folder-based message organization and archival
+  - Workspace management and AI-assisted actions
+  - Professional communication and team coordination
+- **Integration:** Carbon Voice MCP Server for comprehensive messaging platform access
+- **Requirements:** `CARBON_VOICE_API_KEY` environment variable
+
 ## Architecture Benefits
 
 1. **Modularity:** Each agent has a focused responsibility
@@ -58,7 +71,8 @@ This project implements a hierarchical multi-agent system using Google Agent Dev
 ```
 root_agent (Orchestrator)
 ├── market_analyzer (Sub-Agent - always available)
-└── github_agent (Sub-Agent - conditional on GITHUB_TOKEN)
+├── github_agent (Sub-Agent - conditional on GITHUB_TOKEN)
+└── carbon_voice_agent (Sub-Agent - conditional on CARBON_VOICE_API_KEY)
 ```
 
 ## Usage Examples

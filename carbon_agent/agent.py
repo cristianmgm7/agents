@@ -11,6 +11,16 @@ except ValueError as e:
     else:
         raise
 
+try:
+    from .carbon_voice_agent import carbon_voice_agent
+    carbon_voice_available = True
+except ValueError as e:
+    if "CARBON_VOICE_API_KEY" in str(e):
+        carbon_voice_available = False
+        carbon_voice_agent = None
+    else:
+        raise
+
 from .search_agent import market_analyzer
 
 # Create sub_agents list for orchestration
@@ -20,8 +30,12 @@ sub_agents = [market_analyzer]
 if github_available:
     sub_agents.append(github_agent)
 
+# Only add Carbon Voice agent if API key is available
+if carbon_voice_available:
+    sub_agents.append(carbon_voice_agent)
+
 root_agent = Agent(
-    model='gemini-2.5-flash',
+    model='gemini-1.5-flash',
     name='root_agent',
     description='An intelligent orchestrator that coordinates specialized sub-agents for comprehensive task completion.',
     instruction='''You are an intelligent orchestrator agent that coordinates multiple specialized sub-agents to help users accomplish complex tasks.
@@ -29,6 +43,7 @@ root_agent = Agent(
     You have access to specialized sub-agents that can help with different types of tasks:
     - market_analyzer: Professional market analysis, financial research, and investment insights
     ''' + ('- github_agent: GitHub repository management, issues, pull requests, and code analysis\n    ' if github_available else '- github_agent: Not available (configure GITHUB_TOKEN to enable GitHub operations)\n    ') + '''
+    ''' + ('- carbon_voice_agent: Carbon Voice messaging platform operations, communication, and organization\n    ' if carbon_voice_available else '- carbon_voice_agent: Not available (configure CARBON_VOICE_API_KEY to enable messaging operations)\n    ') + '''
     When you need to delegate a task to a sub-agent, use the transfer_to_agent function with the appropriate agent name.
 
     Your role is to:
@@ -40,7 +55,8 @@ root_agent = Agent(
     Examples:
     - For questions about code repositories, issues, or pull requests: transfer_to_agent('github_agent')
     - For market analysis, financial research, or investment insights: transfer_to_agent('market_analyzer')
-    - For complex tasks combining development and market analysis: break it down and transfer to appropriate agents sequentially
+    - For messaging, communication, or workspace organization: transfer_to_agent('carbon_voice_agent')
+    - For complex tasks combining multiple domains: break it down and transfer to appropriate agents sequentially
 
     Always explain what you're doing and why you're transferring to a specific agent.''',
     sub_agents=sub_agents,

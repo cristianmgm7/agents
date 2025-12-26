@@ -10,3 +10,13 @@ except ValueError as e:
         github_agent_available = False
     else:
         raise
+
+# Conditionally import carbon_voice_agent if API key is available
+try:
+    from . import carbon_voice_agent
+    carbon_voice_agent_available = True
+except ValueError as e:
+    if "CARBON_VOICE_API_KEY" in str(e):
+        carbon_voice_agent_available = False
+    else:
+        raise
