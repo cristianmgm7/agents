@@ -180,6 +180,7 @@ ehthumbs.db
 .env.development
 .env.test
 .env.production
+./carbon_agent/.env
 
 # Backup files
 *.bak
