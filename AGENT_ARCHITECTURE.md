@@ -47,6 +47,7 @@ This project implements a hierarchical multi-agent system using Google Agent Dev
   - Workspace management and AI-assisted actions
   - Professional communication and team coordination
 - **Integration:** Carbon Voice MCP Server for comprehensive messaging platform access
+- **Transport:** Stdio with direct API key authentication
 - **Requirements:** `CARBON_VOICE_API_KEY` environment variable
 
 ## Architecture Benefits

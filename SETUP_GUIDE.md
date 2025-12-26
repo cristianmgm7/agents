@@ -15,8 +15,14 @@ Create a `.env` file in the project root:
 # GitHub Agent (Optional)
 GITHUB_TOKEN=your_github_personal_access_token_here
 
-# Carbon Voice Agent (Optional)
+# Carbon Voice Agent (Optional - Uses Stdio Transport)
+# Note: Getting API key requires OAuth2 redirect URL setup with Carbon Voice
 CARBON_VOICE_API_KEY=your_carbon_voice_api_key_here
+
+# For OAuth2 flow (if needed for API key generation):
+CARBON_VOICE_CLIENT_ID=your_client_id_here
+CARBON_VOICE_CLIENT_SECRET=your_client_secret_here
+CARBON_VOICE_REDIRECT_URI=http://localhost:3000/oauth/callback
 
 # Google Search Tool (Optional - requires Google Cloud setup)
 GOOGLE_CLOUD_API_KEY=your_google_cloud_api_key_here
@@ -38,9 +44,67 @@ Features when enabled:
 - Project board management
 
 ### ⚠️ Carbon Voice Agent (Optional)
-**Setup Required:** Add `CARBON_VOICE_API_KEY` to `.env`
+**Setup Required:** Obtain API key through OAuth2 flow with redirect URL
 
-Features when enabled:
+#### Choose Your Integration Method:
+
+**Method A: Stdio Transport (Current Default)**
+- Uses local MCP server process
+- Requires OAuth2 access token as API key
+- Best for: Agent development and testing
+
+**Method B: HTTP Transport with OAuth2 (Recommended for Production)**
+- Direct HTTP API integration
+- Proper OAuth2 token management and refresh
+- Best for: Production deployments and web applications
+
+#### Getting Your Carbon Voice API Key:
+
+**Step 1: Register OAuth2 Application**
+- Go to Carbon Voice developer portal
+- Create new OAuth2 application
+- Set redirect URI: `http://localhost:3000/oauth/callback`
+
+**Step 2: Get OAuth2 Credentials**
+You'll receive:
+- `CARBON_VOICE_CLIENT_ID`
+- `CARBON_VOICE_CLIENT_SECRET`
+
+**Step 3: Choose Token Acquisition Method**
+
+**Option A: Automated OAuth Helper (Recommended)**
+```bash
+# Add to .env first:
+CARBON_VOICE_CLIENT_ID=your_client_id
+CARBON_VOICE_CLIENT_SECRET=your_client_secret
+CARBON_VOICE_REDIRECT_URI=http://localhost:3000/oauth/callback
+
+# Run helper:
+python oauth_helper.py
+```
+
+**Option B: Manual OAuth Flow**
+1. Visit Carbon Voice authorization URL
+2. Complete authentication
+3. Manually exchange authorization code for access token
+
+**Result**: `CARBON_VOICE_API_KEY` will contain your OAuth2 access token
+
+#### Transport Options:
+
+**Stdio Transport (Default)**:
+- **File**: `carbon_voice_agent.py`
+- **Authentication**: Access token as API key
+- **Integration**: npx + local MCP server
+- **Use Case**: Development and testing
+
+**HTTP Transport (OAuth2)**:
+- **File**: `carbon_voice_oauth_agent.py`
+- **Authentication**: Full OAuth2 with token refresh
+- **Integration**: Direct HTTP API calls
+- **Use Case**: Production and web applications
+
+#### Features (Both Transports):
 - Message management (conversation, direct, voice memos)
 - User directory and search operations
 - Conversation thread management
